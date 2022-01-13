@@ -1,0 +1,102 @@
+Sub CombineWorksheets()
+
+    'Ask user for name of sheet to copy from
+    Dim inputsheet As Variant
+    inputsheet = InputBox("Give me the name of the sheet you want to copy from:")
+    On Error GoTo 0
+    
+    'Ask user for name of sheet to send data to
+    'Dim destsheet As Variant
+    'destsheet = InputBox("Give me the name of the sheet you want to paste too:")
+    'On Error GoTo 0
+    
+    'Check if a Destination sheet exists with function call, creates a new one if false
+    If SheetExists("Results") = False Then
+        Sheets.Add
+        ActiveSheet.Name = "Results"
+    End If
+    
+    'Chooses which worksheet you are working with
+    With ThisWorkbook.Worksheets(inputsheet)
+    
+        'Variable declarations ranges and format rule
+        Dim rng As Range
+        Dim re As Range
+        'Set rng = .Range("O66")
+        
+        Dim DefaultRange As Range
+        Dim FormatRuleInput As String
+
+        'Determine a default range based on user's Selection
+        If TypeName(Selection) = "Range" Then
+            Set DefaultRange = Selection
+        Else
+            Set DefaultRange = ActiveCell
+        End If
+
+        'Get A Cell Address From The User to Get Number Format From
+        On Error Resume Next
+        Set rng = Application.InputBox( _
+            Title:="Find range of cells", _
+            Prompt:="Select a cell range to copy from and paste to" & vbCrLf & "Use the format *Cellone:CellTwo*, Ex: A1:A2", _
+            Default:=DefaultRange.Address, _
+            Type:=8)
+        On Error GoTo 0
+
+        'Test to ensure User Did not cancel
+        If rng Is Nothing Then Exit Sub
+  
+        'Highlight Cell Range to check if range function is working
+        'rng.Interior.Color = vbYellow
+    
+        Application.ScreenUpdating = False
+        Dim copySheet As Worksheet
+        Dim pasteSheet As Worksheet
+
+        Set copySheet = Worksheets(inputsheet)
+        Set pasteSheet = Worksheets("Results")
+
+        copySheet.Range("A1:O65").Copy
+        pasteSheet.Cells(Rows.Count, 1).End(xlUp).Offset(0, 0).PasteSpecial xlPasteValues
+        Application.CutCopyMode = False
+        Application.ScreenUpdating = True
+                
+    End With
+    
+End Sub
+'Function CopyPaste(csname As String) As Boolean
+'    With ThisWorkbook.Worksheets(inputsheet)
+'        Dim rng As Range
+'        Dim DefaultRange As Range
+'        Dim FormatRuleInput As String
+'
+'        'Determine a default range based on user's Selection
+'        If TypeName(Selection) = "Range" Then
+'            Set DefaultRange = Selection
+'        Else
+'            Set DefaultRange = ActiveCell
+'        End If
+'
+'        'Get A Cell Address From The User to Get Number Format From
+'        On Error Resume Next
+'        Set rng = Application.InputBox( _
+'            Title:="Find range of cells", _
+'            Prompt:="Select a cell range to copy from and paste to" & vbCrLf & "Use the format *Cellone:CellTwo*, Ex: A1:A2", _
+'            Default:=DefaultRange.Address, _
+'            Type:=8)
+'        On Error GoTo 0
+'
+'        'Test to ensure User Did not cancel
+'        If rng Is Nothing Then Exit Sub
+'End Function
+
+'Function to check if new destination file exists
+
+Function SheetExists(shName As String) As Boolean
+    With ActiveWorkbook
+        On Error Resume Next
+        SheetExists = (.Sheets(shName).Name = shName)
+        On Error GoTo 0
+    End With
+    
+End Function
