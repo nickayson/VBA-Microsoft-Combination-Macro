@@ -1,13 +1,13 @@
 Sub CombineWorksheets()
-    
     'Check if a Destination sheet exists with function call, creates a new one if false
     If SheetExists("Results") = False Then
         Sheets.Add
-        ActiveSheet.Name = "Results"
+        ActiveSheet.name = "Results"
     End If
     
     'Variable declarations ranges and format rule
     Dim rng As Range
+    Dim xCell As Range
         
     Dim DefaultRange As Range
     Dim FormatRuleInput As String
@@ -34,6 +34,15 @@ Sub CombineWorksheets()
     'Test to ensure User Did not cancel
     If rng Is Nothing Then Exit Sub
     
+    'Replace all empty cells with a space just for formatting purposes
+    Application.ScreenUpdating = False
+    For Each xCell In rng
+        If Trim(xCell.Value) = "" Then
+            xCell.Value = " "
+        End If
+    Next
+    Application.ScreenUpdating = True
+    
     'Copy range to copy from and print directly underneath existing data if A column is empty (Trying to find a way to ignore A Column empty on sheet)
     Application.ScreenUpdating = False
     rng.Copy
@@ -41,8 +50,6 @@ Sub CombineWorksheets()
     Application.CutCopyMode = False
     Application.ScreenUpdating = True
         
-  
-'    End With
 End Sub
 
 'Function to check if new destination file exists
@@ -50,8 +57,9 @@ End Sub
 Function SheetExists(shName As String) As Boolean
     With ActiveWorkbook
         On Error Resume Next
-        SheetExists = (.Sheets(shName).Name = shName)
+        SheetExists = (.Sheets(shName).name = shName)
         On Error GoTo 0
     End With
     
 End Function
+
