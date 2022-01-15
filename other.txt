@@ -1,0 +1,33 @@
+Sub CopyRangeFromMultiSheets()
+Dim sh As Worksheet
+    Dim DestSh As Worksheet
+    Dim Last As Long
+    Dim CopyRng As Range
+
+
+    With Application
+        .ScreenUpdating = False
+        .EnableEvents = False
+
+
+        Set DestSh = Sheets("Results")
+        For Each sh In ActiveWorkbook.Worksheets
+            Select Case sh.name
+            Case DestSh.name
+            Case Else
+                'If sh.Name <> "s*" Then
+                If Not sh.name Like "s*" Then
+                    Last = DestSh.Cells(Rows.Count, 1).End(3).Row + 1
+                    sh.Range("A1").End(xlDown).Copy
+                    Sheets("Results").Cells(Last, "A").PasteSpecial xlAll
+                End If
+            End Select
+        Next sh
+
+
+        .ScreenUpdating = True
+        .EnableEvents = True
+    End With
+
+
+End Sub
